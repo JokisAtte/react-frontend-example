@@ -9,16 +9,22 @@ interface BookListItemProps {
 const BookListItem: React.FunctionComponent<BookListItemProps> = ({
   book,
   className,
-}: BookListItemProps) => (
-  <div
-    className={['flex', 'p-6', className]
-      .filter(x => x !== undefined)
-      .join(' ')}
-  >
-    <span className="flex-1 font-medium">{book.title}</span>
-    <span className="flex-1 font-normal ml-5">{book.year}</span>
-    <span className="flex-1">{book.isbn}</span>
-  </div>
-)
+}: BookListItemProps) => {
+  const [authors]: string[] = Object.getOwnPropertyNames(book.authors.primary)
+  const [last, first]: string[] = authors.split(', ')
+
+  return (
+    <div
+      className={['flex', 'p-6', className]
+        .filter(x => x !== undefined)
+        .join(' ')}
+    >
+      <span className="flex-1 font-medium">{book.title}</span>
+      <span className="flex-1 font-normal ml-5">{book.year}</span>
+      <span className="flex-1">{book.isbn}</span>
+      <span className="flex-1">{`${last} ${first}`}</span>
+    </div>
+  )
+}
 
 export default BookListItem

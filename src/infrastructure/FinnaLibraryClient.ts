@@ -7,11 +7,14 @@ interface FinnaClientSearchRecord {
   readonly title: string
   readonly cleanIsbn?: string
   readonly year?: string
+  readonly authors?: string
+  readonly page?: number
 }
 
 interface FinnaClientSearchResponse {
   readonly resultCount: number
   readonly records: readonly FinnaClientSearchRecord[]
+  readonly page?: number
 }
 
 function toBook(searchRecord: FinnaClientSearchRecord): Book {
@@ -19,6 +22,7 @@ function toBook(searchRecord: FinnaClientSearchRecord): Book {
     title: searchRecord.title,
     isbn: searchRecord.cleanIsbn,
     year: searchRecord.year,
+    authors: searchRecord.authors,
   }
 }
 
@@ -26,16 +30,21 @@ function toBook(searchRecord: FinnaClientSearchRecord): Book {
 // Swagger API documentation:
 // https://api.finna.fi/swagger-ui/?url=%2Fapi%2Fv1%3Fswagger#!
 export class FinnaLibraryClient implements BookSearcher {
-  findBooks({ title }: BookSearchCriteria): Promise<BookCollection> {
-    const page = 1
-    const lookFor = `title:"${encodeURIComponent(title)}"`
+  findBooks({
+    title,
+    searchType,
+    page,
+  }: BookSearchCriteria): Promise<BookCollection> {
+    const lookFor = `${searchType.toLowerCase()}:"${encodeURIComponent(title)}"`
+
     const queryParams = [
       ['lookfor', lookFor],
-      ['type', 'AllFields'],
+      ['type', searchType],
       ['field[]', 'title'],
       ['field[]', 'cleanIsbn'],
       ['field[]', 'year'],
-      ['sort', 'relevance,id asc'],
+      ['field[]', 'subjects'],
+      ['field[]', 'authors'],
       ['page', `${page}`],
       ['limit', '20'],
       ['prettyPrint', 'false'],

@@ -6,6 +6,7 @@ import BookSearchControl from './BookSearchControl'
 import { BookSearchCriteria } from 'book/model/BookSearchCriteria'
 import { BookSearcher } from 'book/model/BookSearcher'
 import React from 'react'
+import PageSelector from './PageSelector'
 
 interface BookPageProps {
   readonly bookSearcher: BookSearcher
@@ -18,11 +19,13 @@ const BookPage: React.FunctionComponent<BookPageProps> = ({
     RemoteData.RemoteData<BookCollection>
   >(RemoteData.notAsked())
   const [bookTitle, setBookTitle] = React.useState<string>('')
+  const [searchType, setSearchType] = React.useState<string>('AllFields')
   const [searchCriteria, setSearchCriteria] = React.useState<
     BookSearchCriteria | undefined
   >(undefined)
+  const [page, setPage] = React.useState<number>(1)
 
-  React.useEffect(() => {
+  const updateBookCollection = () => {
     if (searchCriteria === undefined) {
       return
     }
@@ -36,18 +39,44 @@ const BookPage: React.FunctionComponent<BookPageProps> = ({
       .catch(error => {
         setBookCollection(RemoteData.failure(error))
       })
+  }
+
+  const handlePageChange = (pagenum: number) => {
+    setPage(pagenum)
+    setSearchCriteria({
+      title: bookTitle,
+      searchType: searchType,
+      page: page,
+    })
+    updateBookCollection()
+  }
+
+  React.useEffect(() => {
+    updateBookCollection()
   }, [searchCriteria, bookSearcher])
 
   return (
     <div className="flex flex-col px-4 py-4">
+      <PageSelector
+        currentPage={page}
+        changePage={handlePageChange}
+      ></PageSelector>
       <BookSearchControl
         bookTitle={bookTitle}
         onBookTitleChange={setBookTitle}
-        onSearchSubmit={() => setSearchCriteria({ title: bookTitle })}
+        onSearchSubmit={() =>
+          setSearchCriteria({
+            title: bookTitle,
+            searchType: searchType,
+            page: page,
+          })
+        }
         searching={RemoteData.isLoading(bookCollection)}
+        searchType={searchType}
+        onSearchTypeChange={setSearchType}
       />
       <hr className="my-5" />
-      <BookList bookCollection={bookCollection} />
+      <BookList bookCollection={bookCollection} searchType={searchType} />
     </div>
   )
 }
