@@ -4,10 +4,13 @@ import BookListItem from './BookListItem'
 import React from 'react'
 import { RemoteData } from 'langextensions/RemoteData'
 import { assertNever } from 'langextensions/assertNever'
+import PageSelector from './PageSelector'
 
 interface BookListProps {
   readonly bookCollection: RemoteData<BookCollection>
   readonly searchType: string
+  readonly currentPage: number
+  readonly changePage: (pagenum: number) => void
 }
 
 function bookListItemClass(index: number): string {
@@ -17,6 +20,8 @@ function bookListItemClass(index: number): string {
 const BookList: React.FunctionComponent<BookListProps> = ({
   bookCollection,
   searchType,
+  currentPage,
+  changePage,
 }: BookListProps) => {
   switch (bookCollection.type) {
     case 'NotAsked':
@@ -28,6 +33,10 @@ const BookList: React.FunctionComponent<BookListProps> = ({
     case 'Success':
       return (
         <React.Fragment>
+          <PageSelector
+            currentPage={currentPage}
+            changePage={changePage}
+          ></PageSelector>
           <BookListHeader
             searchType={searchType}
             bookCollection={bookCollection.value}
@@ -57,6 +66,10 @@ const BookList: React.FunctionComponent<BookListProps> = ({
               />
             ))}
           </div>
+          <PageSelector
+            currentPage={currentPage}
+            changePage={changePage}
+          ></PageSelector>
         </React.Fragment>
       )
     default:

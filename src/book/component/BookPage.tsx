@@ -57,10 +57,6 @@ const BookPage: React.FunctionComponent<BookPageProps> = ({
 
   return (
     <div className="flex flex-col px-4 py-4">
-      <PageSelector
-        currentPage={page}
-        changePage={handlePageChange}
-      ></PageSelector>
       <BookSearchControl
         bookTitle={bookTitle}
         onBookTitleChange={setBookTitle}
@@ -76,7 +72,12 @@ const BookPage: React.FunctionComponent<BookPageProps> = ({
         onSearchTypeChange={setSearchType}
       />
       <hr className="my-5" />
-      <BookList bookCollection={bookCollection} searchType={searchType} />
+      <BookList
+        bookCollection={bookCollection}
+        searchType={searchType}
+        currentPage={page}
+        changePage={handlePageChange}
+      />
     </div>
   )
 }
